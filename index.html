@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La Tournée 🪄</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a080f;
+      --surface: #110d1a;
+      --surface2: #1a1326;
+      --border: #2d1f3d;
+      --amber: #c084fc;
+      --amber-glow: #d8a5ff;
+      --amber-dim: #7c3aed;
+      --smoke: #6d4a8a;
+      --text: #f0e6ff;
+      --text-dim: #7a6b8a;
+      --danger: #e53e3e;
+      --success: #27ae60;
+      --accent-red: #f43f5e;
+      --accent-red-dim: #9f1239;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Smoke background image */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url('https://images.unsplash.com/photo-1597211684565-dca64d72bdfe?w=1600&auto=format&fit=crop&q=60');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.18;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Dark overlay on top of image */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 80%, rgba(192,132,252,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 60% at 80% 20%, rgba(244,63,94,0.06) 0%, transparent 60%),
+        linear-gradient(180deg, rgba(10,8,15,0.7) 0%, rgba(10,8,15,0.5) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* HEADER */
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      animation: fadeDown 0.8s ease both;
+    }
+
+    header .eyebrow {
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--amber-dim);
+      margin-bottom: 0.5rem;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 6vw, 3.5rem);
+      font-weight: 700;
+      color: var(--amber);
+      text-shadow: 0 0 40px rgba(192,132,252,0.4), 0 0 80px rgba(244,63,94,0.15);
+      line-height: 1.1;
+    }
+
+    header h1 span {
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    header .subtitle {
+      margin-top: 0.5rem;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    .amber-line {
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-red), var(--amber), transparent);
+      margin: 1.2rem auto;
+    }
+
+    /* STATS ROW */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.8s 0.1s ease both;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem 1rem;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+
+    .stat-card:hover { border-color: var(--amber-dim); }
+
+    .stat-card .val {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.8rem;
+      color: var(--amber);
+      display: block;
+    }
+
+    .stat-card .lbl {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-top: 0.3rem;
+    }
+
+    /* MAIN GRID */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 650px) { .main-grid { grid-template-columns: 1fr; } }
+
+    /* CARDS */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    .card-title {
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--amber-dim);
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* FORM */
+    .form-group { margin-bottom: 1rem; }
+
+    label {
+      display: block;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 0.4rem;
+    }
+
+    input, select {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.7rem 0.9rem;
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--amber-dim);
+      box-shadow: 0 0 0 3px rgba(212,132,58,0.1);
+    }
+
+    input::placeholder { color: var(--text-dim); }
+
+    select option { background: var(--surface2); }
+
+    .btn {
+      width: 100%;
+      padding: 0.8rem;
+      border: none;
+      border-radius: 6px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 0.5rem;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-red) 0%, var(--amber-dim) 100%);
+      color: #fff;
+      font-weight: 500;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, var(--accent-red-dim) 0%, var(--amber) 100%);
+      box-shadow: 0 0 24px rgba(192,132,252,0.3), 0 0 12px rgba(244,63,94,0.2);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--amber);
+      border: 1px solid var(--amber-dim);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(212,132,58,0.08);
+      transform: translateY(-1px);
+    }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid rgba(192,57,43,0.3);
+      font-size: 0.7rem;
+      padding: 0.3rem 0.6rem;
+      width: auto;
+      margin-top: 0;
+    }
+
+    .btn-danger:hover { background: rgba(192,57,43,0.1); }
+
+    /* RANDOM PICKER */
+    .picker-result {
+      text-align: center;
+      padding: 1rem;
+      background: var(--surface2);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 0.3rem;
+      margin-top: 0.8rem;
+      transition: all 0.3s;
+    }
+
+    .picker-result .picked-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--amber);
+    }
+
+    .picker-result .picked-sub {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    /* LEADERBOARD */
+    .leaderboard { animation: fadeUp 0.8s 0.25s ease both; }
+
+    .leader-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    .leader-item:last-child { border-bottom: none; }
+
+    .leader-rank {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--text-dim);
+      width: 24px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .leader-rank.gold { color: #f4c430; }
+    .leader-rank.silver { color: #c0c0c0; }
+    .leader-rank.bronze { color: #cd7f32; }
+
+    .leader-name {
+      flex: 1;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .leader-count {
+      font-size: 0.75rem;
+      color: var(--amber-dim);
+      text-align: right;
+    }
+
+    .leader-bar-wrap {
+      width: 60px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .leader-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-red-dim), var(--accent-red), var(--amber));
+      border-radius: 2px;
+      transition: width 0.6s ease;
+    }
+
+    /* HISTORY */
+    .history-list { animation: fadeUp 0.8s 0.3s ease both; }
+
+    .history-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 0.9rem 0;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .history-item:last-child { border-bottom: none; }
+
+    .history-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--amber-dim);
+      margin-top: 6px;
+      flex-shrink: 0;
+    }
+
+    .history-info { flex: 1; }
+
+    .history-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: var(--text);
+    }
+
+    .history-meta {
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      margin-top: 0.2rem;
+      display: flex;
+      gap: 1rem;
+    }
+
+    .history-amount {
+      color: var(--amber-dim);
+      font-size: 0.8rem;
+      align-self: center;
+    }
+
+    .history-actions { align-self: center; }
+
+    /* STREAK BANNER */
+    .streak-banner {
+      background: linear-gradient(135deg, var(--surface) 0%, rgba(192,132,252,0.08) 50%, rgba(244,63,94,0.05) 100%);
+      border: 1px solid var(--accent-red-dim);
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      animation: fadeUp 0.8s 0.15s ease both;
+    }
+
+    .streak-icon { font-size: 1.8rem; }
+
+    .streak-text .top {
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--amber-dim);
+    }
+
+    .streak-text .name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--amber);
+    }
+
+    .streak-text .sub {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--surface2);
+      border: 1px solid var(--amber-dim);
+      color: var(--text);
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      z-index: 999;
+      transition: transform 0.3s ease;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      white-space: nowrap;
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 400px;
+      animation: scaleIn 0.2s ease;
+    }
+
+    .modal h3 {
+      font-family: 'Playfair Display', serif;
+      color: var(--amber);
+      margin-bottom: 1.2rem;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1.2rem;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-dim);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .spinning { animation: spin 0.4s linear; }
+
+    /* FULL WIDTH CARD */
+    .full-width { grid-column: 1 / -1; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="eyebrow">Tracker de soirée</div>
+    <h1>La <span>Tournée</span> 🪄</h1>
+    <div class="amber-line"></div>
+    <div class="subtitle">Qui a payé la dernière chicha ?</div>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card"><span class="val" id="statTotal">0</span><span class="lbl">Tournées</span></div>
+    <div class="stat-card"><span class="val" id="statParticipants">0</span><span class="lbl">Participants</span></div>
+    <div class="stat-card"><span class="val" id="statTotal2">0 CHF</span><span class="lbl">Total dépensé</span></div>
+    <div class="stat-card"><span class="val" id="statAvg">0 CHF</span><span class="lbl">Moyenne / tournée</span></div>
+  </div>
+
+  <!-- STREAK BANNER -->
+  <div class="streak-banner" id="streakBanner" style="display:none">
+    <div class="streak-icon">🔥</div>
+    <div class="streak-text">
+      <div class="top">Doit payer la prochaine</div>
+      <div class="name" id="streakName">—</div>
+      <div class="sub" id="streakSub">Le plus longtemps sans payer</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- ADD SESSION -->
+    <div class="card">
+      <div class="card-title">✦ Nouvelle tournée</div>
+      <div class="form-group">
+        <label>Qui paie ?</label>
+        <input type="text" id="payerInput" placeholder="Prénom..." list="namesSuggestions" />
+        <datalist id="namesSuggestions"></datalist>
+      </div>
+      <div class="form-group">
+        <label>Montant (CHF) — optionnel</label>
+        <input type="number" id="amountInput" placeholder="ex: 45" min="0" step="0.5" />
+      </div>
+      <div class="form-group">
+        <label>Note — optionnel</label>
+        <input type="text" id="noteInput" placeholder="ex: Chez Tarbouch, soirée sympa..." />
+      </div>
+      <button class="btn btn-primary" onclick="addSession()">＋ Enregistrer la tournée</button>
+    </div>
+
+    <!-- RANDOM PICKER -->
+    <div class="card">
+      <div class="card-title">🎰 Tirage au sort</div>
+      <div class="form-group">
+        <label>Participants ce soir</label>
+        <input type="text" id="pickerNames" placeholder="Alice, Bob, Carlos..." />
+      </div>
+      <button class="btn btn-ghost" onclick="pickRandom()">Tirer au sort 🎲</button>
+      <div class="picker-result" id="pickerResult">
+        <span class="picked-sub">Entrez les noms et lancez !</span>
+      </div>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div class="card leaderboard">
+      <div class="card-title">🏆 Classement</div>
+      <div id="leaderboardList"><div class="empty-state">Aucune donnée</div></div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="card history-list">
+      <div class="card-title">📋 Historique</div>
+      <div id="historyList"><div class="empty-state">Aucune tournée enregistrée</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" style="
+  position:fixed;inset:0;z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(10,8,15,0.97);
+  backdrop-filter:blur(8px);
+  font-family:'DM Mono',monospace;
+">
+  <div style="
+    background:#110d1a;
+    border:1px solid #2d1f3d;
+    border-radius:14px;
+    padding:2.5rem 2rem;
+    width:100%;max-width:360px;
+    text-align:center;
+    box-shadow:0 0 60px rgba(192,132,252,0.1);
+    animation:scaleIn 0.3s ease;
+  ">
+    <div style="font-size:2.5rem;margin-bottom:0.5rem">🪄</div>
+    <div style="font-family:'Playfair Display',serif;font-size:1.6rem;color:#c084fc;margin-bottom:0.3rem">La Tournée</div>
+    <div style="font-size:0.65rem;letter-spacing:0.2em;color:#7a6b8a;margin-bottom:2rem;text-transform:uppercase">Accès privé</div>
+    <div style="margin-bottom:0.5rem;text-align:left">
+      <label style="display:block;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:#7a6b8a;margin-bottom:0.4rem">Mot de passe</label>
+      <input id="loginInput" type="password" placeholder="••••••••" style="
+        width:100%;background:#1a1326;border:1px solid #2d1f3d;
+        border-radius:6px;padding:0.7rem 0.9rem;color:#f0e6ff;
+        font-family:'DM Mono',monospace;font-size:0.9rem;outline:none;
+        transition:border-color 0.2s;box-sizing:border-box;
+      " onkeydown="if(event.key==='Enter')checkLogin()" />
+    </div>
+    <div id="loginError" style="font-size:0.7rem;color:#f43f5e;margin-bottom:0.8rem;min-height:1.2rem;text-align:left"></div>
+    <button onclick="checkLogin()" style="
+      width:100%;padding:0.8rem;border:none;border-radius:6px;
+      background:linear-gradient(135deg,#f43f5e,#7c3aed);
+      color:#fff;font-family:'DM Mono',monospace;
+      font-size:0.8rem;letter-spacing:0.15em;text-transform:uppercase;
+      cursor:pointer;transition:opacity 0.2s;
+    ">Entrer 🚪</button>
+    <div style="margin-top:1.2rem;font-size:0.6rem;color:#3d2d50">
+      🔒 Accès réservé aux amis du groupe
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- DELETE MODAL -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3>Supprimer cette tournée ?</h3>
+    <p style="font-size:0.8rem;color:var(--text-dim)">Cette action est irréversible.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" style="flex:1" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-primary" style="flex:1;background:var(--danger)" onclick="confirmDelete()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── LOGIN ────────────────────────────────────────────────
+  const APP_PASSWORD = "chicha2024"; // ⚠️ Changer avant de déployer
+  const AUTH_KEY = "latournee_auth";
+
+  function checkLogin() {
+    const input = document.getElementById("loginInput").value;
+    if (input === APP_PASSWORD) {
+      sessionStorage.setItem(AUTH_KEY, "1");
+      const screen = document.getElementById("loginScreen");
+      screen.style.transition = "opacity 0.4s";
+      screen.style.opacity = "0";
+      setTimeout(() => screen.style.display = "none", 400);
+    } else {
+      document.getElementById("loginError").textContent = "⚠️ Mot de passe incorrect";
+      document.getElementById("loginInput").value = "";
+      document.getElementById("loginInput").focus();
+      setTimeout(() => document.getElementById("loginError").textContent = "", 2500);
+    }
+  }
+
+  function initAuth() {
+    if (sessionStorage.getItem(AUTH_KEY) === "1") {
+      document.getElementById("loginScreen").style.display = "none";
+    }
+  }
+
+  // ── DATA ─────────────────────────────────────────────────
+  const DATA_KEY = 'latournee_data';
+  let sessions = [];
+  let deleteTarget = null;
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(DATA_KEY);
+      sessions = raw ? JSON.parse(raw) : [];
+    } catch { sessions = []; }
+  }
+
+  function save() {
+    localStorage.setItem(DATA_KEY, JSON.stringify(sessions));
+  }
+
+  // Export to JSON file (for Infomaniak deployment)
+  function exportJSON() {
+    const blob = new Blob([JSON.stringify(sessions, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'data.json';
+    a.click();
+  }
+
+  // ── ADD SESSION ──────────────────────────────────────────
+  function addSession() {
+    const name = document.getElementById('payerInput').value.trim();
+    const amount = parseFloat(document.getElementById('amountInput').value) || null;
+    const note = document.getElementById('noteInput').value.trim();
+
+    if (!name) { showToast('⚠️ Entre un prénom !'); return; }
+
+    const session = {
+      id: Date.now(),
+      name,
+      amount,
+      note,
+      date: new Date().toISOString()
+    };
+
+    sessions.unshift(session);
+    save();
+    render();
+
+    document.getElementById('payerInput').value = '';
+    document.getElementById('amountInput').value = '';
+    document.getElementById('noteInput').value = '';
+
+    showToast(`✓ ${name} a payé la tournée !`);
+  }
+
+  // ── DELETE ───────────────────────────────────────────────
+  function askDelete(id) {
+    deleteTarget = id;
+    document.getElementById('deleteModal').classList.add('open');
+  }
+
+  function confirmDelete() {
+    sessions = sessions.filter(s => s.id !== deleteTarget);
+    save();
+    render();
+    closeModal();
+    showToast('Tournée supprimée');
+  }
+
+  function closeModal() {
+    document.getElementById('deleteModal').classList.remove('open');
+    deleteTarget = null;
+  }
+
+  // ── RANDOM PICKER ────────────────────────────────────────
+  function pickRandom() {
+    const input = document.getElementById('pickerNames').value;
+    const names = input.split(',').map(n => n.trim()).filter(Boolean);
+    if (names.length < 2) { showToast('⚠️ Entre au moins 2 noms !'); return; }
+
+    const result = document.getElementById('pickerResult');
+    result.innerHTML = '<span class="picked-sub spinning">🎲 Tirage...</span>';
+
+    setTimeout(() => {
+      const picked = names[Math.floor(Math.random() * names.length)];
+      result.innerHTML = `
+        <span class="picked-name">${picked}</span>
+        <span class="picked-sub">paye la prochaine !</span>
+      `;
+    }, 600);
+  }
+
+  // ── RENDER ───────────────────────────────────────────────
+  function render() {
+    renderStats();
+    renderStreak();
+    renderLeaderboard();
+    renderHistory();
+    renderSuggestions();
+  }
+
+  function renderStats() {
+    const total = sessions.length;
+    const names = new Set(sessions.map(s => s.name));
+    const amounts = sessions.filter(s => s.amount).map(s => s.amount);
+    const totalAmount = amounts.reduce((a, b) => a + b, 0);
+    const avg = amounts.length ? (totalAmount / amounts.length) : 0;
+
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statParticipants').textContent = names.size;
+    document.getElementById('statTotal2').textContent = totalAmount ? totalAmount.toFixed(0) + ' CHF' : '— CHF';
+    document.getElementById('statAvg').textContent = avg ? avg.toFixed(0) + ' CHF' : '— CHF';
+  }
+
+  function renderStreak() {
+    if (sessions.length === 0) {
+      document.getElementById('streakBanner').style.display = 'none';
+      return;
+    }
+
+    // Find who paid least recently
+    const lastPaid = {};
+    sessions.forEach(s => {
+      if (!lastPaid[s.name]) lastPaid[s.name] = s.date;
+    });
+
+    const oldest = Object.entries(lastPaid).sort((a, b) => new Date(a[1]) - new Date(b[1]))[0];
+    const days = Math.floor((Date.now() - new Date(oldest[1])) / 86400000);
+
+    document.getElementById('streakBanner').style.display = 'flex';
+    document.getElementById('streakName').textContent = oldest[0];
+    document.getElementById('streakSub').textContent = `Dernière fois il y a ${days === 0 ? 'moins d\'un jour' : days + ' jour(s)'}`;
+  }
+
+  function renderLeaderboard() {
+    const counts = {};
+    const amounts = {};
+    sessions.forEach(s => {
+      counts[s.name] = (counts[s.name] || 0) + 1;
+      amounts[s.name] = (amounts[s.name] || 0) + (s.amount || 0);
+    });
+
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const max = sorted[0]?.[1] || 1;
+
+    const medals = ['gold', 'silver', 'bronze'];
+    const medalIcons = ['🥇', '🥈', '🥉'];
+
+    const html = sorted.length === 0
+      ? '<div class="empty-state">Aucune donnée</div>'
+      : sorted.map(([name, count], i) => `
+        <div class="leader-item">
+          <span class="leader-rank ${medals[i] || ''}">${i < 3 ? medalIcons[i] : i + 1}</span>
+          <span class="leader-name">${name}</span>
+          <div class="leader-bar-wrap"><div class="leader-bar" style="width:${(count/max*100)}%"></div></div>
+          <div class="leader-count">${count}×${amounts[name] ? '<br>' + amounts[name].toFixed(0) + ' CHF' : ''}</div>
+        </div>
+      `).join('');
+
+    document.getElementById('leaderboardList').innerHTML = html;
+  }
+
+  function renderHistory() {
+    const html = sessions.length === 0
+      ? '<div class="empty-state">Aucune tournée enregistrée</div>'
+      : sessions.map(s => `
+        <div class="history-item">
+          <div class="history-dot"></div>
+          <div class="history-info">
+            <div class="history-name">${s.name}</div>
+            <div class="history-meta">
+              <span>${formatDate(s.date)}</span>
+              ${s.note ? `<span>${s.note}</span>` : ''}
+            </div>
+          </div>
+          ${s.amount ? `<div class="history-amount">${s.amount} CHF</div>` : ''}
+          <div class="history-actions">
+            <button class="btn btn-danger" onclick="askDelete(${s.id})">✕</button>
+          </div>
+        </div>
+      `).join('');
+
+    document.getElementById('historyList').innerHTML = html;
+  }
+
+  function renderSuggestions() {
+    const names = [...new Set(sessions.map(s => s.name))];
+    document.getElementById('namesSuggestions').innerHTML =
+      names.map(n => `<option value="${n}">`).join('');
+  }
+
+  // ── UTILS ────────────────────────────────────────────────
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('fr-CH', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  // Close modal on overlay click
+  document.getElementById('deleteModal').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeModal();
+  });
+
+  // Enter key on form
+  document.getElementById('payerInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('amountInput').focus();
+  });
+  document.getElementById('amountInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('noteInput').focus();
+  });
+  document.getElementById('noteInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addSession();
+  });
+
+  // ── INIT ─────────────────────────────────────────────────
+  initAuth();
+  load();
+  render();
+</script>
+</body>
+</html>
