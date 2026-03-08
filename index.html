@@ -301,7 +301,7 @@
       amounts[s.name] = (amounts[s.name] || 0) + (s.amount || 0);
     });
 
-    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const sorted = Object.entries(amounts).sort((a, b) => b[1] - a[1]);
     const max = sorted[0]?.[1] || 1;
 
     const medals = ['gold', 'silver', 'bronze'];
@@ -309,12 +309,12 @@
 
     const html = sorted.length === 0
       ? '<div class="empty-state">Aucune donnée</div>'
-      : sorted.map(([name, count], i) => `
+      : sorted.map(([name, total], i) => `
         <div class="leader-item">
           <span class="leader-rank ${medals[i] || ''}">${i < 3 ? medalIcons[i] : i + 1}</span>
           <span class="leader-name">${name}</span>
-          <div class="leader-bar-wrap"><div class="leader-bar" style="width:${(count/max*100)}%"></div></div>
-          <div class="leader-count">${count}×${amounts[name] ? '<br>' + amounts[name].toFixed(0) + ' CHF' : ''}</div>
+          <div class="leader-bar-wrap"><div class="leader-bar" style="width:${(total/max*100)}%"></div></div>
+          <div class="leader-count">${total.toFixed(0)} CHF<br>${counts[name]}×</div>
         </div>
       `).join('');
 
