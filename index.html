@@ -31,9 +31,9 @@
   <div class="streak-banner" id="streakBanner" style="display:none">
     <div class="streak-icon">🔥</div>
     <div class="streak-text">
-      <div class="top">Devrait payer la prochaine</div>
+      <div class="top">Dernière tournée payée par</div>
       <div class="name" id="streakName">—</div>
-      <div class="sub" id="streakSub">Le plus longtemps sans payer</div>
+      <div class="sub" id="streakSub"></div>
     </div>
   </div>
 
@@ -284,18 +284,13 @@
       return;
     }
 
-    // Find who paid least recently
-    const lastPaid = {};
-    sessions.forEach(s => {
-      if (!lastPaid[s.name]) lastPaid[s.name] = s.date;
-    });
-
-    const oldest = Object.entries(lastPaid).sort((a, b) => new Date(a[1]) - new Date(b[1]))[0];
-    const days = Math.floor((Date.now() - new Date(oldest[1])) / 86400000);
+    const last = sessions[0];
+    const days = Math.floor((Date.now() - new Date(last.date)) / 86400000);
+    const when = days === 0 ? 'Aujourd\'hui' : `Il y a ${days} jour(s)`;
 
     document.getElementById('streakBanner').style.display = 'flex';
-    document.getElementById('streakName').textContent = oldest[0];
-    document.getElementById('streakSub').textContent = `Dernière fois il y a ${days === 0 ? 'moins d\'un jour' : days + ' jour(s)'}`;
+    document.getElementById('streakName').textContent = last.name;
+    document.getElementById('streakSub').textContent = `${when}${last.amount ? ' · ' + last.amount + ' CHF' : ''}`;
   }
 
   function renderLeaderboard() {
