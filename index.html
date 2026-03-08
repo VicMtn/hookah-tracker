@@ -137,6 +137,8 @@
 
   // ── LOGIN ────────────────────────────────────────────────
   const APP_PASSWORD_HASH = "4a991c9f392b96354531f624afb27ca2c8131cb1119adf0c097ba398a061c412";
+  const AUTH_KEY = "latournee_auth";
+  const AUTH_TTL = 60 * 60 * 1000; // 1 heure
 
   async function hashSHA256(text) {
     const data = new TextEncoder().encode(text);
@@ -144,10 +146,21 @@
     return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
   }
 
+  function isAuthValid() {
+    const ts = localStorage.getItem(AUTH_KEY);
+    if (!ts) return false;
+    if (Date.now() - parseInt(ts, 10) > AUTH_TTL) {
+      localStorage.removeItem(AUTH_KEY);
+      return false;
+    }
+    return true;
+  }
+
   async function checkLogin() {
     const input = document.getElementById("loginInput").value;
     const inputHash = await hashSHA256(input);
     if (inputHash === APP_PASSWORD_HASH) {
+      localStorage.setItem(AUTH_KEY, Date.now().toString());
       const screen = document.getElementById("loginScreen");
       screen.style.transition = "opacity 0.4s";
       screen.style.opacity = "0";
@@ -372,6 +385,9 @@
   });
 
   // ── INIT ─────────────────────────────────────────────────
+  if (isAuthValid()) {
+    document.getElementById("loginScreen").style.display = "none";
+  }
   listenToFirebase();
 </script>
 </body>
