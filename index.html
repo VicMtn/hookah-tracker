@@ -659,7 +659,24 @@
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+
 <script>
+  // ── FIREBASE ────────────────────────────────────────────
+  const firebaseConfig = {
+    apiKey: "AIzaSyCn1MLwUe8FuXSmwcpjW3P-1I709QgoAEc",
+    authDomain: "hookah-tracker.firebaseapp.com",
+    databaseURL: "https://hookah-tracker-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "hookah-tracker",
+    storageBucket: "hookah-tracker.firebasestorage.app",
+    messagingSenderId: "846229047102",
+    appId: "1:846229047102:web:3f02e919a41cd8b10d0e6f"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const sessionsRef = db.ref('sessions');
+
   // ── LOGIN ────────────────────────────────────────────────
   const APP_PASSWORD = "chicha2024"; // ⚠️ Changer avant de déployer
   const AUTH_KEY = "latournee_auth";
@@ -687,28 +704,21 @@
   }
 
   // ── DATA ─────────────────────────────────────────────────
-  const DATA_KEY = 'latournee_data';
   let sessions = [];
   let deleteTarget = null;
 
-  function load() {
-    try {
-      const raw = localStorage.getItem(DATA_KEY);
-      sessions = raw ? JSON.parse(raw) : [];
-    } catch { sessions = []; }
-  }
-
-  function save() {
-    localStorage.setItem(DATA_KEY, JSON.stringify(sessions));
-  }
-
-  // Export to JSON file (for Infomaniak deployment)
-  function exportJSON() {
-    const blob = new Blob([JSON.stringify(sessions, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'data.json';
-    a.click();
+  function listenToFirebase() {
+    sessionsRef.on('value', snapshot => {
+      const data = snapshot.val();
+      if (data) {
+        sessions = Object.entries(data)
+          .map(([key, val]) => ({ ...val, _key: key }))
+          .sort((a, b) => new Date(b.date) - new Date(a.date));
+      } else {
+        sessions = [];
+      }
+      render();
+    });
   }
 
   // ── ADD SESSION ──────────────────────────────────────────
@@ -727,15 +737,14 @@
       date: new Date().toISOString()
     };
 
-    sessions.unshift(session);
-    save();
-    render();
-
-    document.getElementById('payerInput').value = '';
-    document.getElementById('amountInput').value = '';
-    document.getElementById('noteInput').value = '';
-
-    showToast(`✓ ${name} a payé la tournée !`);
+    sessionsRef.push(session)
+      .then(() => {
+        document.getElementById('payerInput').value = '';
+        document.getElementById('amountInput').value = '';
+        document.getElementById('noteInput').value = '';
+        showToast(`✓ ${name} a payé la tournée !`);
+      })
+      .catch(() => showToast('⚠️ Erreur de connexion'));
   }
 
   // ── DELETE ───────────────────────────────────────────────
@@ -745,11 +754,13 @@
   }
 
   function confirmDelete() {
-    sessions = sessions.filter(s => s.id !== deleteTarget);
-    save();
-    render();
+    const target = sessions.find(s => s.id === deleteTarget);
+    if (target && target._key) {
+      sessionsRef.child(target._key).remove()
+        .then(() => showToast('Tournée supprimée'))
+        .catch(() => showToast('⚠️ Erreur de suppression'));
+    }
     closeModal();
-    showToast('Tournée supprimée');
   }
 
   function closeModal() {
@@ -905,8 +916,7 @@
 
   // ── INIT ─────────────────────────────────────────────────
   initAuth();
-  load();
-  render();
+  listenToFirebase();
 </script>
 </body>
 </html>
