@@ -678,12 +678,19 @@
   const sessionsRef = db.ref('sessions');
 
   // ── LOGIN ────────────────────────────────────────────────
-  const APP_PASSWORD = "chicha2024"; // ⚠️ Changer avant de déployer
+  const APP_PASSWORD_HASH = "4a991c9f392b96354531f624afb27ca2c8131cb1119adf0c097ba398a061c412";
   const AUTH_KEY = "latournee_auth";
 
-  function checkLogin() {
+  async function hashSHA256(text) {
+    const data = new TextEncoder().encode(text);
+    const buffer = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(buffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  async function checkLogin() {
     const input = document.getElementById("loginInput").value;
-    if (input === APP_PASSWORD) {
+    const inputHash = await hashSHA256(input);
+    if (inputHash === APP_PASSWORD_HASH) {
       sessionStorage.setItem(AUTH_KEY, "1");
       const screen = document.getElementById("loginScreen");
       screen.style.transition = "opacity 0.4s";
