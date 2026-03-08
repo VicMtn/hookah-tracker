@@ -136,9 +136,9 @@
   const sessionsRef = db.ref('sessions');
 
   // ── LOGIN ────────────────────────────────────────────────
-  const APP_PASSWORD_HASH = "4a991c9f392b96354531f624afb27ca2c8131cb1119adf0c097ba398a061c412";
+  const APP_PASSWORD_HASH = "685dc9bef848252f0dfd054a0a4d480295be5ad0fe80005192bfff713ad6fe65";
   const AUTH_KEY = "latournee_auth";
-  const AUTH_TTL = 60 * 60 * 1000; // 1 heure
+  const AUTH_TTL = 60 * 60 * 1000;
 
   async function hashSHA256(text) {
     const data = new TextEncoder().encode(text);
