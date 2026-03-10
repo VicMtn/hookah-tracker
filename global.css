@@ -519,7 +519,7 @@ select option { background: var(--surface2); }
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(10, 8, 15, 0.97);
+  background: rgba(10, 8, 15, 1);
   backdrop-filter: blur(8px);
   font-family: 'DM Mono', monospace;
 }
