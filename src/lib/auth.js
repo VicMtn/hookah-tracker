@@ -6,6 +6,7 @@ import {
   GoogleAuthProvider,
 } from "firebase/auth";
 import { auth } from "./firebase";
+import { isRegistrationOpen } from "./registrations";
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -14,7 +15,20 @@ export async function signIn(email, password) {
 }
 
 export async function signInWithGoogle() {
-  return signInWithPopup(auth, googleProvider);
+  const result = await signInWithPopup(auth, googleProvider);
+
+  const isNewUser = result._tokenResponse?.isNewUser ?? false;
+
+  if (isNewUser) {
+    const open = await isRegistrationOpen();
+    if (!open) {
+      await result.user.delete();
+      await firebaseSignOut(auth);
+      throw { code: "auth/registration-closed" };
+    }
+  }
+
+  return result;
 }
 
 export async function signOut() {
@@ -31,8 +45,11 @@ export function getAuthErrorMessage(code) {
     "auth/user-not-found": "Aucun compte avec cet email.",
     "auth/wrong-password": "Mot de passe incorrect.",
     "auth/invalid-email": "Adresse email invalide.",
+
     "auth/too-many-requests": "Trop de tentatives. Réessaie plus tard.",
     "auth/network-request-failed": "Erreur réseau. Vérifie ta connexion.",
+
+    "auth/registrations-closed": "Les inscriptions sont actuellement fermées.",
   };
   return messages[code] ?? "Une erreur est survenue. Réessaie.";
 }
