@@ -54,3 +54,6 @@ dist-ssr
 
 # Environment variables
 .env
+
+# Commits config
+.husky/_/
