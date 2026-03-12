@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write src/",
-    "prepare": "husky"
+    "prepare": "husky",
+    "deploy": "npm run build && firebase deploy"
   },
   "dependencies": {
     "dotenv": "^17.3.1",
