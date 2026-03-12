@@ -1,4 +1,3 @@
-import { clearTimeout, setTimeout } from "node:timers/promises";
 import { ref } from "vue";
 
 const message = ref("");
