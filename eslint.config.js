@@ -1,15 +1,25 @@
-import pluginVue from "eslint-plugin-vue"
-import prettierConfig from "@vue/eslint-config-prettier"
+import js from "@eslint/js";
+import pluginVue from "eslint-plugin-vue";
+import prettier from "@vue/eslint-config-prettier";
 
 export default [
   {
-    name: "app/files-to-lint",
-    files: ["**/*.{js,mjs,jsx,vue}"],
+    ignores: ["dist", "dist-ssr", "coverage", "node_modules"],
   },
-  {
-    name: "app/files-to-ignore",
-    ignores: ["**/dist/**", "**/dist-ssr/**", "**/coverage/**"],
-  },
+
+  js.configs.recommended,
+
   ...pluginVue.configs["flat/recommended"],
-  prettierConfig,
-]
+
+  {
+    files: ["**/*.vue"],
+    languageOptions: {
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+      },
+    },
+  },
+
+  prettier,
+];
