@@ -1,6 +1,7 @@
 import js from "@eslint/js";
 import pluginVue from "eslint-plugin-vue";
 import prettier from "@vue/eslint-config-prettier";
+import globals from "globals";
 
 export default [
   {
@@ -12,8 +13,11 @@ export default [
   ...pluginVue.configs["flat/recommended"],
 
   {
-    files: ["**/*.vue"],
+    files: ["**/*.vue", "**/*.js"],
     languageOptions: {
+      globals: {
+        ...globals.browser,
+      },
       parserOptions: {
         ecmaVersion: "latest",
         sourceType: "module",
