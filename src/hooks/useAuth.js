@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { onAuthChange } from "@/lib/auth";
 
 export function useAuth() {
@@ -14,7 +14,7 @@ export function useAuth() {
     });
   });
 
-  onUnMounted(() => {
+  onUnmounted(() => {
     unsubscribe?.();
   });
 
